@@ -1,10 +1,15 @@
 import requests
+import os
+from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
 
-# Replace these with your real keys
-TELEGRAM_BOT_TOKEN = "8020736200:AAFOEJBI4H4hazpI-eIC25garCClgWi8Mio"
-OPENWEATHER_API_KEY = "e01dca6d21ad3bcd0c827da22b55b899"
+# Load from .env
+load_dotenv()
+
+# Secure keys from environment
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 # Weather fetching function
 def get_weather(city):
@@ -34,7 +39,7 @@ def get_weather(city):
     except Exception as e:
         return f"Error getting weather: {e}"
 
-# Telegram command handlers
+# Telegram handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Hi! Send me any city name to get the current weather ☁️")
 
@@ -47,9 +52,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Main
 if __name__ == "__main__":
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
-
     print("Weather bot is running...")
     app.run_polling()
